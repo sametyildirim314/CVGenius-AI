@@ -90,7 +90,7 @@ namespace UniCareer.SimpleAPI.Controllers
         }
 // Tüm Kullanıcıları getir
       
-       [HttpGet("kullanıcıgetir")]
+       [HttpGet("kullanicigetir")]
        public async Task<IActionResult> TumKullaniciGetir()
         {
 
