@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using UniCareer.SimpleAPI.Data;
 using UniCareer.SimpleAPI.Models;
+using UniCareer.SimpleAPI.DTOs.Cv;
 using UniCareer.SimpleAPI.Services;
 
 namespace UniCareer.SimpleAPI.Controllers

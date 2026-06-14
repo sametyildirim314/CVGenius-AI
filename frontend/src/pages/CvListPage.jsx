@@ -1,42 +1,50 @@
 import React, { useState, useEffect, useMemo } from "react";
 
+// API adresi .env dosyasındaki REACT_APP_API_URL'den okunur (örn: http://localhost:5283)
 const API = process.env.REACT_APP_API_URL;
 
 function CvListPage() {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [search, setSearch] = useState("");
-    const [expandedId, setExpandedId] = useState(null);
+    // --- STATE TANIMLARI ---
+    const [data, setData] = useState([]);           // Sunucudan gelen tüm CV listesi
+    const [loading, setLoading] = useState(true);    // Veri yükleniyor mu? (skeleton göstermek için)
+    const [error, setError] = useState(null);        // Hata mesajı (varsa)
+    const [search, setSearch] = useState("");        // Arama kutusuna yazılan metin
+    const [expandedId, setExpandedId] = useState(null); // Detayları açık olan CV'nin id'si
 
+    // Sayfa ilk yüklendiğinde CV'leri otomatik getir ([] => yalnızca bir kez çalışır)
     useEffect(() => {
         fetchCvs();
     }, []);
 
+    // CV'leri backend'den çeken fonksiyon (GET /api/Cv)
     const fetchCvs = () => {
         setLoading(true);
         setError(null);
 
         fetch(`${API}/api/Cv`)
             .then((res) => {
+                // HTTP durumu başarısızsa hata fırlat
                 if (!res.ok) throw new Error(`Sunucu hatası: ${res.status}`);
+                // Yanıtın JSON olduğundan emin ol (HTML hata sayfası gelmesin)
                 const ct = res.headers.get("content-type");
                 if (!ct || !ct.includes("application/json"))
                     throw new Error("Beklenmeyen yanıt formatı");
                 return res.json();
             })
             .then((d) => {
-                setData(d);
+                setData(d);          // Gelen veriyi state'e yaz
                 setLoading(false);
             })
             .catch((err) => {
-                setError(err.message);
+                setError(err.message); // Hatayı kullanıcıya göstermek için sakla
                 setLoading(false);
             });
     };
 
+    // Arama metnine göre listeyi filtreler.
+    // useMemo: data veya search değişmedikçe yeniden hesaplama yapılmaz (performans)
     const filtered = useMemo(() => {
-        if (!search.trim()) return data;
+        if (!search.trim()) return data; // Arama boşsa tüm listeyi döndür
         const q = search.toLowerCase();
         return data.filter(
             (cv) =>
@@ -46,6 +54,7 @@ function CvListPage() {
         );
     }, [data, search]);
 
+    // İsim baş harflerini üretir (avatar içinde göstermek için). "Ahmet Yılmaz" => "AY"
     const getInitials = (name) => {
         if (!name) return "?";
         return name
@@ -53,9 +62,10 @@ function CvListPage() {
             .map((w) => w[0])
             .join("")
             .toUpperCase()
-            .slice(0, 2);
+            .slice(0, 2); // En fazla 2 harf
     };
 
+    // ISO tarih metnini Türkçe okunabilir formata çevirir (örn: "13 Haziran 2026")
     const formatDate = (dateStr) => {
         if (!dateStr) return "";
         try {
@@ -65,10 +75,11 @@ function CvListPage() {
                 year: "numeric",
             });
         } catch {
-            return dateStr;
+            return dateStr; // Geçersiz tarihte ham metni döndür
         }
     };
 
+    // Benzersiz kullanıcı sayısını hesaplar (Set ile tekrarları eler)
     const userCount = useMemo(() => {
         const unique = new Set(data.map((cv) => cv.kullaniciId));
         return unique.size;
@@ -81,7 +92,7 @@ function CvListPage() {
                 <p>Sisteme kayıtlı tüm CV'leri görüntüleyin ve yönetin</p>
             </div>
 
-            {/* Stats */}
+            {/* İstatistik kartları: toplam CV ve benzersiz kullanıcı sayısı */}
             <div className="stats-bar">
                 <div className="stat-card">
                     <div className="stat-icon blue">
@@ -111,7 +122,7 @@ function CvListPage() {
                 </div>
             </div>
 
-            {/* Search + Refresh */}
+            {/* Arama kutusu + yenileme butonu (buton dönen ikonla loading durumunu gösterir) */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "24px", alignItems: "stretch" }}>
                 <div className="search-bar" style={{ flex: 1, marginBottom: 0 }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -134,7 +145,7 @@ function CvListPage() {
                 </button>
             </div>
 
-            {/* Error */}
+            {/* Hata mesajı kutusu - yalnızca error varsa render edilir, "Tekrar Dene" butonu içerir */}
             {error && (
                 <div className="alert alert-error">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -153,7 +164,7 @@ function CvListPage() {
                 </div>
             )}
 
-            {/* Loading Skeletons */}
+            {/* Yükleniyor placeholder'ı - gerçek veri gelene kadar 6 adet iskelet kart gösterir */}
             {loading && (
                 <div className="cv-grid">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -177,7 +188,7 @@ function CvListPage() {
                 </div>
             )}
 
-            {/* Empty State */}
+            {/* Boş durum - hata yok, yükleme bitti ama liste boşsa (arama sonucu yok veya hiç CV yok) */}
             {!loading && !error && filtered.length === 0 && (
                 <div className="empty-state">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -193,7 +204,7 @@ function CvListPage() {
                 </div>
             )}
 
-            {/* CV Grid */}
+            {/* CV listesi - filtrelenmiş CV'ler grid olarak gösterilir */}
             {!loading && filtered.length > 0 && (
                 <>
                     {search && (
@@ -207,6 +218,7 @@ function CvListPage() {
                                 key={cv.id}
                                 className="cv-card"
                                 style={{ animationDelay: `${index * 0.05}s` }}
+                                // Karta tıklayınca detayları aç/kapat (aynı karta tekrar tıklanırsa kapanır)
                                 onClick={() => setExpandedId(expandedId === cv.id ? null : cv.id)}
                             >
                                 <div className="cv-card-header">
@@ -246,7 +258,7 @@ function CvListPage() {
                                     )}
                                 </div>
 
-                                {/* Expanded Details */}
+                                {/* Genişletilmiş detay - sadece tıklanan kartta açılır (özet, yetenekler, deneyim) */}
                                 {expandedId === cv.id && (
                                     <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--color-border)", animation: "fadeIn 0.3s ease" }}>
                                         {cv.özet && (

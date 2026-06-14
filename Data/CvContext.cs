@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniCareer.SimpleAPI.Models;
-using Microsoft.EntityFrameworkCore.ChangeTracking; // Gerekli olan namespace
+using Microsoft.EntityFrameworkCore.ChangeTracking; 
 
 namespace UniCareer.SimpleAPI.Data
 {
