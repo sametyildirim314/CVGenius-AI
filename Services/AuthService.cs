@@ -176,7 +176,7 @@ namespace UniCareer.SimpleAPI.Services
                 issuer: _jwt.Issuer,           // iss claim
                 audience: _jwt.Audience,     // aud claim
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwt.ExpireMinutes),
+                expires: DateTime.Now.AddMinutes(_jwt.ExpireMinutes),
                 signingCredentials: credentials
             );
 
