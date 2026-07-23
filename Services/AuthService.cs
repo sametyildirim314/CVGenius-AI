@@ -11,11 +11,9 @@ using UniCareer.SimpleAPI.Models;
 
 namespace UniCareer.SimpleAPI.Services
 {
-    /// <summary>
     /// Kimlik doğrulama iş mantığı: kayıt, giriş, şifre hash ve JWT üretimi.
     /// Controller ince kalır; asıl iş burada yapılır.
-    /// Program.cs'te kayıt: builder.Services.AddScoped&lt;AuthService&gt;();
-    /// </summary>
+    /// Program.cs'te kayıt: builder.Services.AddScoped;AuthService>();
     public class AuthService
     {
         private readonly CvContext _context;
@@ -39,9 +37,9 @@ namespace UniCareer.SimpleAPI.Services
         // KAYIT (REGISTER)
         // ─────────────────────────────────────────────────────────────
 
-        /// <summary>
+       
         /// Yeni kullanıcı oluşturur ve otomatik giriş yaparak token döner.
-        /// </summary>
+
         /// <returns>Başarılıysa GirisYanitDto; değilse hata mesajı</returns>
         public async Task<(GirisYanitDto? Yanit, string? Hata)> KayitOlAsync(KayitDto istek)
         {
@@ -81,9 +79,9 @@ namespace UniCareer.SimpleAPI.Services
         // GİRİŞ (LOGIN)
         // ─────────────────────────────────────────────────────────────
 
-        /// <summary>
+        
         /// E-posta + şifre ile giriş. Başarılıysa JWT token döner.
-        /// </summary>
+
         public async Task<(GirisYanitDto? Yanit, string? Hata)> GirisYapAsync(GirisDto istek)
         {
             if (string.IsNullOrWhiteSpace(istek.Email) || string.IsNullOrWhiteSpace(istek.Sifre))
@@ -104,20 +102,17 @@ namespace UniCareer.SimpleAPI.Services
         // ─────────────────────────────────────────────────────────────
         // ŞİFRE İŞLEMLERİ (BCrypt)
         // ─────────────────────────────────────────────────────────────
-
-        /// <summary>
         /// Düz metin şifreyi BCrypt hash'ine çevirir.
         /// BCrypt her seferinde farklı salt üretir; hash içinde saklar.
         /// Örnek çıktı: $2a$11$xK8vN2... (60 karakter civarı)
-        /// </summary>
         private static string SifreHashle(string duzSifre)
         {
             return BCrypt.Net.BCrypt.HashPassword(duzSifre);
         }
 
-        /// <summary>
+        
         /// Giriş sırasında: kullanıcının girdiği düz şifre ile DB'deki hash karşılaştırılır.
-        /// </summary>
+       
         private static bool SifreDogrula(string duzSifre, string passwordHash)
         {
             // Eski kayıtlarda PasswordHash boş olabilir (migration öncesi kullanıcılar)
@@ -130,10 +125,7 @@ namespace UniCareer.SimpleAPI.Services
         // ─────────────────────────────────────────────────────────────
         // JWT TOKEN ÜRETİMİ
         // ─────────────────────────────────────────────────────────────
-
-        /// <summary>
         /// Kullanıcı bilgisinden GirisYanitDto oluşturur (token dahil).
-        /// </summary>
         private GirisYanitDto GirisYanitiOlustur(Kullanici kullanici)
         {
             return new GirisYanitDto
@@ -146,11 +138,8 @@ namespace UniCareer.SimpleAPI.Services
                 Token = TokenOlustur(kullanici)
             };
         }
-
-        /// <summary>
         /// JWT token üretir. Token içinde kullanıcı Id, e-posta ve rol bilgisi taşınır.
         /// SecretKey ile imzalanır; sonraki isteklerde backend aynı key ile doğrular.
-        /// </summary>
         private string TokenOlustur(Kullanici kullanici)
         {
             // Claim = token içindeki "iddia" / bilgi parçası
