@@ -24,7 +24,7 @@ namespace UniCareer.SimpleAPI.Models
         [JsonIgnore] // API yanıtında şifre hash'i dışarı sızmamalı
         public string PasswordHash { get; set; } = string.Empty;
 
-        
+        /
         public string Rol { get; set; } = "User";
 
         // Hesabın oluşturulma tarihi.

@@ -6,10 +6,9 @@ namespace UniCareer.SimpleAPI.Models
     public sealed class Kullanici
     {
         public Kullanici(){
-
-            Id = Guid.NewGuid();
+            Id
         }
-
+        // Birincil anahtar (Primary Key). Her kullanıcıya benzersiz Id atanır.
         public Guid Id { get; set; } = Guid.NewGuid();
 
         public string Ad { get; set; } = string.Empty;
@@ -24,7 +23,7 @@ namespace UniCareer.SimpleAPI.Models
         [JsonIgnore] // API yanıtında şifre hash'i dışarı sızmamalı
         public string PasswordHash { get; set; } = string.Empty;
 
-        
+        // Yetkilendirme: "User" veya "Admin". Varsayılan "User".
         public string Rol { get; set; } = "User";
 
         // Hesabın oluşturulma tarihi.

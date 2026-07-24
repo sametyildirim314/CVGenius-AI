@@ -2,15 +2,14 @@
 
 namespace UniCareer.SimpleAPI.Models
 {
-    
-    public sealed class Kullanici
+    /// <summary>
+    /// Sisteme kayıtlı ana kullanıcı. CV'lerin sahibidir.
+    /// ENTITY → DbContext'te DbSet&lt;Kullanici&gt; → SQL'de Kullanicilar tablosu.
+    /// </summary>
+    public class Kullanici
     {
-        public Kullanici(){
-
-            Id = Guid.NewGuid();
-        }
-
-        public Guid Id { get; set; } = Guid.NewGuid();
+        // Birincil anahtar (Primary Key). Her kullanıcıya benzersiz Id atanır.
+        public int Id { get; set; }
 
         public string Ad { get; set; } = string.Empty;
         public string Soyad { get; set; } = string.Empty;
@@ -24,7 +23,7 @@ namespace UniCareer.SimpleAPI.Models
         [JsonIgnore] // API yanıtında şifre hash'i dışarı sızmamalı
         public string PasswordHash { get; set; } = string.Empty;
 
-        
+        // Yetkilendirme: "User" veya "Admin". Varsayılan "User".
         public string Rol { get; set; } = "User";
 
         // Hesabın oluşturulma tarihi.
