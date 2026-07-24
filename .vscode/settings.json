@@ -1,0 +1,6 @@
+{
+  "local-history.enabled": false,
+  "files.exclude": {
+    "**/.history": true
+  }
+}

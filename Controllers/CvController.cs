@@ -48,11 +48,14 @@ namespace UniCareer.SimpleAPI.Controllers
         {
             try
             {
-                // 1. ADIM: Sadece varlığını kontrol et (TAKİP ETME - AsNoTracking)
-                // Include falan yapmıyoruz, hafızayı kirletmiyoruz.
-                var mevcutCvVarMi = await _context.Cvler.AnyAsync(c => c.Id == id);
+                // 1. ADIM: Mevcut kaydı al (sadece Id + KullaniciId; AsNoTracking)
+                var mevcutCv = await _context.Cvler
+                    .AsNoTracking()
+                    .Where(c => c.Id == id)
+                    .Select(c => new { c.Id, c.KullaniciId })
+                    .FirstOrDefaultAsync();
 
-                if (!mevcutCvVarMi)
+                if (mevcutCv is null)
                     return NotFound(new { mesaj = "Güncellenecek CV bulunamadı." });
 
                 // 2. ADIM: DTO'daki verileri tertemiz, yeni bir Entity nesnesine basıyoruz.
@@ -60,7 +63,7 @@ namespace UniCareer.SimpleAPI.Controllers
                 var güncellenmişEntity = new CvEntity
                 {
                     Id = id, // Mevcut ID'yi veriyoruz ki SQL kimi güncelleyeceğini bilsin
-                    KullaniciId = 1, // Bunu gerçek projede token'dan almalısın
+                    KullaniciId = mevcutCv.KullaniciId, // Sahibi koru (ileride token'dan alınabilir)
                     AdSoyad = guncelVeri.AdSoyad,
                     Unvan = guncelVeri.Unvan,
                     Email = guncelVeri.Email,
@@ -137,7 +140,7 @@ namespace UniCareer.SimpleAPI.Controllers
 
         // CV Oluşturma ve İndirme Endpoint'i
         [HttpPost("kullanici/{kullaniciId}/olustur-ve-indir")]
-        public async Task<IActionResult> CvOlusturVeIndir(int kullaniciId, [FromBody] CvIstekDto istek)
+        public async Task<IActionResult> CvOlusturVeIndir(Guid kullaniciId, [FromBody] CvIstekDto istek)
         {
             // 1. Sağlam Hata Yönetimi (Robust Error Handling)
             try
