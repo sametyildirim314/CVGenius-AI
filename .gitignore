@@ -366,8 +366,9 @@ MigrationBackup/
 .env
 .env.*
 !.env.example
-appsettings.Local.json
 appsettings.*.Local.json
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+.vscode/
